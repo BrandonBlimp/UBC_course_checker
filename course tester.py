@@ -13,9 +13,6 @@ destination = ['6043633029@msg.telus.com']
 USERNAME = "b_loong5@yahoo.com"
 PASSWORD = "29083ragnarok"
 text_subtype = 'plain'
-content="""\
-your course is now available
-"""
 subject=""
 
 # get URL input from user
@@ -48,8 +45,8 @@ def getHTML(input_arg):
 		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=MATH&course=200&section=921")
 	elif input_arg == "4":
 		dept = raw_input("Now type the department code (example: CPSC) and MAKE SURE IT'S ALL CAPS: ")
-		courseNumber = raw_input("Now type the course number (example: 304): ")
-		section = raw_input("Now type the section number (example: 911): ")
+		courseNumber = raw_input("Now type the course number: ")
+		section = raw_input("Now type the section number: ")
 		input = "https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=" + dept + "&course=" + courseNumber + "&section=" + section
 		req = urllib2.Request(input)
 	else:
@@ -64,11 +61,12 @@ def getHTML(input_arg):
 		return getHTML(input)
 	return response.read()
 
-def sendMessage():
+def sendMessage(course):
 	from smtplib import SMTP_SSL as SMTP       # this invokes the secure SMTP protocol (port 465, uses SSL)
 	# from smtplib import SMTP                  # use this for standard SMTP protocol   (port 25, no encryption)
 	from email.MIMEText import MIMEText
-
+	
+	content = "A spot has opened up in %s. Quick, go find some wifi!" % (course)
 	try:
 		msg = MIMEText(content, text_subtype)
 		msg['Subject']=       ""
@@ -99,9 +97,7 @@ while True:
 	except AttributeError:
 		print "something went wrong!"
 	if int(seatsRemaining) > 0:
-		global content
-		content = "a spot has opened up in %s" % (course)
-		sendMessage()
+		sendMessage(course)
 		print "a spot opened up in %s! sent a notification message" % (course)
 		quit = ""
 		while quit != "quit":
