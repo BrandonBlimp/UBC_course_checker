@@ -1,13 +1,29 @@
+#! /usr/local/bin/python
 import time
 from datetime import datetime
 import urllib2
 import re
 import sys
+import os
 
+# email stuff
+SMTPserver = 'smtp.att.yahoo.com'
+sender =     "b_loong5@yahoo.com"
+destination = ['6043633029@msg.telus.com']
+USERNAME = "b_loong5@yahoo.com"
+PASSWORD = "29083ragnarok"
+text_subtype = 'plain'
+content="""\
+your course is now available
+"""
+subject=""
+
+# get URL input from user
 input = raw_input("To select an option, type the corresponding number and press enter. \n"
 					"Alternatively, you can type the URL of the section of the course you want. \n"
 					"\t1: check spaces for CPSC 304\n"
-					"\t2: check spaces for MATH 221\n")
+					"\t2: check spaces for MATH 221\n"
+					"\t3: check spaces for MATH 200\n")
 
 def searchBetween(sb, sa, html):
 	try:
@@ -26,6 +42,8 @@ def getHTML(input_local):
 	# MATH 221
 	elif input_local == "2":
 		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=MATH&course=221&section=921")
+	elif input_local == "3":
+		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=MATH&course=200&section=921")
 	else:
 		req = urllib2.Request(input_local)
 	
@@ -38,7 +56,29 @@ def getHTML(input_local):
 		return getHTML(input)
 	return response.read()
 
+def sendMessage():
+	from smtplib import SMTP_SSL as SMTP       # this invokes the secure SMTP protocol (port 465, uses SSL)
+	# from smtplib import SMTP                  # use this for standard SMTP protocol   (port 25, no encryption)
+	from email.MIMEText import MIMEText
+
+	try:
+		msg = MIMEText(content, text_subtype)
+		msg['Subject']=       ""
+		msg['From']   = "UBC_course_tester" # some SMTP servers will do this automatically, not all
+
+		conn = SMTP(SMTPserver)
+		conn.set_debuglevel(False)
+		conn.login(USERNAME, PASSWORD)
+		try:
+			conn.sendmail(sender, destination, msg.as_string())
+		finally:
+			conn.close()
+
+	except Exception, exc:
+		sys.exit( "mail failed; %s" % str(exc) ) # give a error message
 	
+	
+# "main" loop
 while True:
 	now = datetime.now()
 	html = getHTML(input)
@@ -50,5 +90,14 @@ while True:
 		print "there are %s seats remaining in %s on %s/%s/%s at %s:%s" % (seatsRemaining, course, now.year, now.month, now.day, now.hour, now.minute)
 	except AttributeError:
 		print "something went wrong!"
-	
-	time.sleep(1)
+	if int(seatsRemaining) > 0:
+		global content
+		content = "a spot has opened up in %s" % (course)
+		sendMessage()
+		print "a spot opened up in %s! sent a notification message" % (course)
+		quit = ""
+		while quit != "quit":
+			global quit
+			quit = raw_input("type \"quit\" to exit the program")
+		sys.exit("bye")
+	time.sleep(60)
