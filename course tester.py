@@ -23,7 +23,8 @@ input = raw_input("To select an option, type the corresponding number and press 
 					"Alternatively, you can type the URL of the section of the course you want. \n"
 					"\t1: check spaces for CPSC 304\n"
 					"\t2: check spaces for MATH 221\n"
-					"\t3: check spaces for MATH 200\n")
+					"\t3: check spaces for MATH 200\n"
+					"\t4: EXPERIMENTAL (kind of)\n")
 
 def searchBetween(sb, sa, html):
 	try:
@@ -35,17 +36,24 @@ def searchBetween(sb, sa, html):
 		# if not found in string
 		print "something went wrong!"
 
-def getHTML(input_local):
+def getHTML(input_arg):
+	global input
 	# CPSC 304
-	if input_local == "1":
+	if input_arg == "1":
 		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=CPSC&course=304&section=911")
 	# MATH 221
-	elif input_local == "2":
+	elif input_arg == "2":
 		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=MATH&course=221&section=921")
-	elif input_local == "3":
+	elif input_arg == "3":
 		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=MATH&course=200&section=921")
+	elif input_arg == "4":
+		dept = raw_input("Now type the department code (example: CPSC) and MAKE SURE IT'S ALL CAPS: ")
+		courseNumber = raw_input("Now type the course number (example: 304): ")
+		section = raw_input("Now type the section number (example: 911): ")
+		input = "https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=" + dept + "&course=" + courseNumber + "&section=" + section
+		req = urllib2.Request(input)
 	else:
-		req = urllib2.Request(input_local)
+		req = urllib2.Request(input_arg)
 	
 	# let's check
 	try:
