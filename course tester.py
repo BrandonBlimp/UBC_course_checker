@@ -4,23 +4,17 @@ import urllib2
 import re
 import sys
 
-def searchBetween(sb, sa):
+def searchBetween(sb, sa, html):
 	try:
 		stringBefore = re.escape(sb)
 		stringAfter = re.escape(sa)
 		searchString = stringBefore + "(.+?)" + stringAfter
-		return re.search(searchString, response).group(1)
+		return re.search(searchString, html).group(1)
 	except AttributeError:
 		# if not found in string
 		print "something went wrong!"
-		sys.exit()
 
-def getURLInput():
-	# wait for user to type URL
-	input = raw_input("To select an option, type the corresponding number and press enter. \n"
-					"Alternatively, you can type the URL of the section of the course you want. \n"
-					"\t1: check spaces for CPSC 304\n"
-					"\t2: check spaces for MATH 221\n")
+def getHTML(input):
 	# CPSC 304
 	if input == "1":
 		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=CPSC&course=304&section=911")
@@ -28,26 +22,31 @@ def getURLInput():
 	elif input == "2":
 		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=MATH&course=221&section=921")
 	else:
-		try:
-			req = urllib2.Request(input)
-		# if not valid URL
-		except ValueError:
-			print "That wasn't a valid URL. What are you doing with your life?"
-			getURLInput()
-	return req
+		req = urllib2.Request(input)
+	
+	# let's check
+	try:
+		response = urllib2.urlopen(req)
+	except ValueError:
+		print "That isn't a valid URL. What are you doing with your life? Let's try this again. \n \n \n"
+		getHTML(input)
+	return response.read()
 
+input = raw_input("To select an option, type the corresponding number and press enter. \n"
+				"Alternatively, you can type the URL of the section of the course you want. \n"
+				"\t1: check spaces for CPSC 304\n"
+				"\t2: check spaces for MATH 221\n")
+	
 while True:
 	now = datetime.now()
-	# prints the time the line was printed
-	# print "This line was printed on %s/%s/%s at %s:%s" % (now.year, now.month, now.day, now.hour, now.minute)
-	response = urllib2.urlopen(getURLInput())
-	response = response.read()
+	html = getHTML(input)
 	
 	# Look for relevant info
-	seatsRemaining = searchBetween('Total Seats Remaining:</td><td align=left><strong>', '</strong></td>')
-	course = searchBetween("<h4>", "</h4>")
+	try:
+		seatsRemaining = searchBetween('Total Seats Remaining:</td><td align=left><strong>', '</strong></td>', html)
+		course = searchBetween("<h4>", "</h4>", html)
+		print "there are %s seats remaining in %s on %s/%s/%s at %s:%s" % (seatsRemaining, course, now.year, now.month, now.day, now.hour, now.minute)
+	except AttributeError:
+		print "something went wrong!"
 	
-	print "there are %s seats remaining in %s on %s/%s/%s at %s:%s" % (seatsRemaining, course, now.year, now.month, now.day, now.hour, now.minute)
-
-	
-	time.sleep(1000)
+	time.sleep(2)
