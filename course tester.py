@@ -56,7 +56,6 @@ def getHTML(input_arg):
 	try:
 		response = urllib2.urlopen(req)
 	except ValueError:
-		global input
 		input = raw_input("That isn't a valid URL. What are you doing with your life? \n")
 		return getHTML(input)
 	return response.read()
@@ -81,7 +80,7 @@ def sendMessage(course):
 			conn.close()
 
 	except Exception, exc:
-		sys.exit( "mail failed; %s" % str(exc) ) # give a error message
+		# sys.exit( "mail failed; %s" % str(exc) ) # give a error message
 	
 	
 # "main" loop
@@ -98,10 +97,9 @@ while True:
 		print "something went wrong!"
 	if int(seatsRemaining) > 0:
 		sendMessage(course)
-		print "a spot opened up in %s! sent a notification message" % (course)
-		quit = ""
-		while quit != "quit":
-			global quit
-			quit = raw_input("type \"quit\" to exit the program")
-		sys.exit("bye")
+		print "a spot opened up in %s! sent a notification message\n" % (course)
+		# quit = ""
+		# while quit != "quit":
+		# 	quit = raw_input("type \"quit\" to exit the program\n")
+		sys.exit("bye bye!")
 	time.sleep(60)
