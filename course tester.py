@@ -4,6 +4,11 @@ import urllib2
 import re
 import sys
 
+input = raw_input("To select an option, type the corresponding number and press enter. \n"
+					"Alternatively, you can type the URL of the section of the course you want. \n"
+					"\t1: check spaces for CPSC 304\n"
+					"\t2: check spaces for MATH 221\n")
+
 def searchBetween(sb, sa, html):
 	try:
 		stringBefore = re.escape(sb)
@@ -14,28 +19,25 @@ def searchBetween(sb, sa, html):
 		# if not found in string
 		print "something went wrong!"
 
-def getHTML(input):
+def getHTML(input_local):
 	# CPSC 304
-	if input == "1":
+	if input_local == "1":
 		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=CPSC&course=304&section=911")
 	# MATH 221
-	elif input == "2":
+	elif input_local == "2":
 		req = urllib2.Request("https://courses.students.ubc.ca/cs/main?pname=subjarea&tname=subjareas&req=5&dept=MATH&course=221&section=921")
 	else:
-		req = urllib2.Request(input)
+		req = urllib2.Request(input_local)
 	
 	# let's check
 	try:
 		response = urllib2.urlopen(req)
 	except ValueError:
-		print "That isn't a valid URL. What are you doing with your life? Let's try this again. \n \n \n"
-		getHTML(input)
+		global input
+		input = raw_input("That isn't a valid URL. What are you doing with your life? \n")
+		return getHTML(input)
 	return response.read()
 
-input = raw_input("To select an option, type the corresponding number and press enter. \n"
-				"Alternatively, you can type the URL of the section of the course you want. \n"
-				"\t1: check spaces for CPSC 304\n"
-				"\t2: check spaces for MATH 221\n")
 	
 while True:
 	now = datetime.now()
@@ -49,4 +51,4 @@ while True:
 	except AttributeError:
 		print "something went wrong!"
 	
-	time.sleep(2)
+	time.sleep(1)
