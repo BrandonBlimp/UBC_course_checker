@@ -11,7 +11,7 @@ SMTPserver = 'smtp.att.yahoo.com'
 sender =     "b_loong5@yahoo.com"
 destination = ['6043633029@msg.telus.com']
 USERNAME = "b_loong5@yahoo.com"
-PASSWORD = "29083ragnarok"
+PASSWORD = "NICE TRY"
 text_subtype = 'plain'
 subject=""
 
